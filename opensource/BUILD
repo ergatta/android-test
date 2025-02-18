@@ -12,3 +12,14 @@ java_import(
         "//visibility:public",
     ],
 )
+
+java_import(
+    name = "entry_point_import",
+    jars = [
+        "entry_point_deploy.jar",
+    ],
+    neverlink = 1,
+    visibility = [
+        "//visibility:public",
+    ],
+)
