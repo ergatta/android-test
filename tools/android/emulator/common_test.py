@@ -24,7 +24,7 @@ import subprocess
 import mox
 import six
 
-from google.apputils import basetest as googletest
+from google_apputils.google.apputils import basetest as googletest
 from tools.android.emulator import common
 
 

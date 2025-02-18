@@ -52,7 +52,7 @@ import portpicker
 
 
 from tools.android.emulator import resources
-from google.apputils import stopwatch
+from google_apputils.google.apputils import stopwatch
 
 from tools.android.emulator import common
 from tools.android.emulator import emulator_meta_data_pb2

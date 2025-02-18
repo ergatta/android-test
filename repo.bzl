@@ -1,6 +1,10 @@
 """Skylark rules to setup the WORKSPACE in the opensource bazel world."""
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", _http_archive = "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
+def http_archive(**kwargs):
+    maybe(_http_archive, **kwargs)
 
 # These dependencies are required for *developing* this project.
 def _development_repositories():
@@ -83,6 +87,8 @@ def android_test_repositories(with_dev_repositories = False):
         sha256 = "47959d0651c32102c10ad919b8a0ffe0ae85f44b8457ddcf2bdc0358fb03dc29",
         strip_prefix = "google-apputils-0.4.2",
         url = "https://pypi.python.org/packages/69/66/a511c428fef8591c5adfa432a257a333e0d14184b6c5d03f1450827f7fe7/google-apputils-0.4.2.tar.gz",
+        patches = [str(Label("//opensource:google-apputils.patch"))],
+        patch_args = ["-p1"],
     )
 
     http_archive(

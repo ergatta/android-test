@@ -1,0 +1,253 @@
+diff --git a/google/apputils/app.py b/google/apputils/app.py
+index c2031cf..6a778cf 100644
+--- a/google/apputils/app.py
++++ b/google/apputils/app.py
+@@ -91,8 +91,7 @@ class HelpFlag(flags.BooleanFlag):
+     if arg:
+       usage(shorthelp=1, writeto_stdout=1)
+       # Advertise --helpfull on stdout, since usage() was on stdout.
+-      print
+-      print 'Try --helpfull to get a list of all flags.'
++      print('\nTry --helpfull to get a list of all flags.')
+       sys.exit(1)
+ 
+ 
+@@ -146,7 +145,7 @@ def parse_flags_with_usage(args):
+   try:
+     argv = FLAGS(args)
+     return argv
+-  except flags.FlagsError, error:
++  except flags.FlagsError as error:
+     sys.stderr.write('FATAL Flags parsing error: %s\n' % error)
+     sys.stderr.write('Pass --helpshort or --helpfull to see help on flags.\n')
+     sys.exit(1)
+@@ -218,7 +217,7 @@ def really_start(main=None):
+         sys.exit(retval)
+       else:
+         sys.exit(main(argv))
+-  except UsageError, error:
++  except UsageError as error:
+     usage(shorthelp=1, detailed_error=error, exitcode=error.exitcode)
+   except:
+     if FLAGS.pdb_post_mortem:
+@@ -265,9 +264,9 @@ def _actual_start():
+ 
+   try:
+     really_start()
+-  except SystemExit, e:
++  except SystemExit as e:
+     raise
+-  except Exception, e:
++  except Exception as e:
+     # Call any installed exception handlers which may, for example,
+     # log to a file or send email.
+     for handler in EXCEPTION_HANDLERS:
+@@ -323,7 +322,7 @@ def usage(shorthelp=0, writeto_stdout=0, detailed_error=None, exitcode=None):
+     stdfile.write('\n')
+     if detailed_error is not None:
+       stdfile.write('\n%s\n' % detailed_error)
+-  except IOError, e:
++  except IOError as e:
+     # We avoid printing a huge backtrace if we get EPIPE, because
+     # "foo.par --help | less" is a frequent use case.
+     if e.errno != errno.EPIPE:
+diff --git a/google/apputils/appcommands.py b/google/apputils/appcommands.py
+index 4f0c48d..a7074e2 100755
+--- a/google/apputils/appcommands.py
++++ b/google/apputils/appcommands.py
+@@ -296,7 +296,7 @@ class Cmd(object):
+         else:
+           assert isinstance(ret, int)
+         return ret
+-      except app.UsageError, error:
++      except app.UsageError as error:
+         app.usage(shorthelp=1, detailed_error=error, exitcode=error.exitcode)
+       except:
+         if FLAGS.pdb_post_mortem:
+@@ -703,7 +703,7 @@ def ParseFlagsWithUsage(argv):
+   try:
+     _cmd_argv = FLAGS(argv)
+     return _cmd_argv
+-  except flags.FlagsError, error:
++  except flags.FlagsError as error:
+     ShortHelpAndExit('FATAL Flags parsing error: %s' % error)
+ 
+ 
+@@ -758,9 +758,9 @@ def _CommandsStart(unused_argv):
+   try:
+     sys.modules['__main__'].main(GetCommandArgv())
+   # If sys.exit was called, return with error code.
+-  except SystemExit, e:
++  except SystemExit as e:
+     sys.exit(e.code)
+-  except Exception, error:
++  except Exception as error:
+     traceback.print_exc()  # Print a backtrace to stderr.
+     ShortHelpAndExit('\nFATAL error in main: %s' % error)
+ 
+diff --git a/google/apputils/basetest.py b/google/apputils/basetest.py
+index 58b8152..a4db7ae 100755
+--- a/google/apputils/basetest.py
++++ b/google/apputils/basetest.py
+@@ -1060,7 +1060,7 @@ class CapturedStream(object):
+     # Open file to save stream to
+     cap_fd = os.open(self._filename,
+                      os.O_CREAT | os.O_TRUNC | os.O_WRONLY,
+-                     0600)
++                     0o600)
+ 
+     # Send stream to this file
+     self._stream.flush()
+@@ -1075,7 +1075,7 @@ class CapturedStream(object):
+     # Append stream to file
+     cap_fd = os.open(self._filename,
+                      os.O_CREAT | os.O_APPEND | os.O_WRONLY,
+-                     0600)
++                     0o600)
+ 
+     # Send stream to this file
+     self._stream.flush()
+diff --git a/google/apputils/file_util.py b/google/apputils/file_util.py
+index f41e204..8d2a9cd 100644
+--- a/google/apputils/file_util.py
++++ b/google/apputils/file_util.py
+@@ -42,7 +42,7 @@ def Read(filename):
+     return fp.read()
+ 
+ 
+-def Write(filename, contents, overwrite_existing=True, mode=0666, gid=None):
++def Write(filename, contents, overwrite_existing=True, mode=0o666, gid=None):
+   """Create a file 'filename' with 'contents', with the mode given in 'mode'.
+ 
+   The 'mode' is modified by the umask, as in open(2).  If
+@@ -55,7 +55,7 @@ def Write(filename, contents, overwrite_existing=True, mode=0666, gid=None):
+     contents: str; the data to write to the file
+     overwrite_existing: bool; whether or not to allow the write if the file
+                         already exists
+-    mode: int; permissions with which to create the file (default is 0666 octal)
++    mode: int; permissions with which to create the file (default is 0o666 octal)
+     gid: int; group id with which to create the file
+   """
+   flags = os.O_WRONLY | os.O_TRUNC | os.O_CREAT
+@@ -70,7 +70,7 @@ def Write(filename, contents, overwrite_existing=True, mode=0666, gid=None):
+     os.chown(filename, -1, gid)
+ 
+ 
+-def AtomicWrite(filename, contents, mode=0666, gid=None):
++def AtomicWrite(filename, contents, mode=0o666, gid=None):
+   """Create a file 'filename' with 'contents' atomically.
+ 
+   As in Write, 'mode' is modified by the umask.  This creates and moves
+@@ -84,7 +84,7 @@ def AtomicWrite(filename, contents, mode=0666, gid=None):
+   Args:
+     filename: str; the name of the file
+     contents: str; the data to write to the file
+-    mode: int; permissions with which to create the file (default is 0666 octal)
++    mode: int; permissions with which to create the file (default is 0o666 octal)
+     gid: int; group id with which to create the file
+   """
+   fd, tmp_filename = tempfile.mkstemp(dir=os.path.dirname(filename))
+@@ -97,10 +97,10 @@ def AtomicWrite(filename, contents, mode=0666, gid=None):
+     if gid is not None:
+       os.chown(tmp_filename, -1, gid)
+     os.rename(tmp_filename, filename)
+-  except OSError, exc:
++  except OSError as exc:
+     try:
+       os.remove(tmp_filename)
+-    except OSError, e:
++    except OSError as e:
+       exc = OSError('%s. Additional errors cleaning up: %s' % (exc, e))
+     raise exc
+ 
+@@ -158,7 +158,7 @@ def TemporaryDirectory(suffix='', prefix='tmp', base_path=None):
+   finally:
+     try:
+       shutil.rmtree(temp_dir_path)
+-    except OSError, e:
++    except OSError as e:
+       if e.message == 'Cannot call rmtree on a symbolic link':
+         # Interesting synthetic exception made up by shutil.rmtree.
+         # Means we received a symlink from mkdtemp.
+@@ -193,7 +193,7 @@ def MkDirs(directory, force_mode=None):
+         # only chmod if we created
+         if force_mode is not None:
+           os.chmod(path, force_mode)
+-    except OSError, exc:
++    except OSError as exc:
+       if not (exc.errno == errno.EEXIST and os.path.isdir(path)):
+         raise
+ 
+@@ -209,7 +209,7 @@ def RmDirs(dir_name):
+   """
+   try:
+     shutil.rmtree(dir_name)
+-  except OSError, err:
++  except OSError as err:
+     if err.errno != errno.ENOENT:
+       raise
+ 
+@@ -218,12 +218,12 @@ def RmDirs(dir_name):
+     while parent_directory:
+       try:
+         os.rmdir(parent_directory)
+-      except OSError, err:
++      except OSError as err:
+         if err.errno != errno.ENOENT:
+           raise
+ 
+       parent_directory = os.path.dirname(parent_directory)
+-  except OSError, err:
++  except OSError as err:
+     if err.errno not in (errno.EACCES, errno.ENOTEMPTY, errno.EPERM):
+       raise
+ 
+diff --git a/google/apputils/run_script_module.py b/google/apputils/run_script_module.py
+index 7526842..6f95a72 100644
+--- a/google/apputils/run_script_module.py
++++ b/google/apputils/run_script_module.py
+@@ -119,7 +119,7 @@ def StripQuotes(s):
+ 
+ def PrintOurUsage():
+   """Print usage for the stub script."""
+-  print 'Stub script %s (auto-generated). Options:' % sys.argv[0]
++  print('Stub script %s (auto-generated). Options:' % sys.argv[0])
+   print ('--helpstub               '
+          'Show help for stub script.')
+   print ('--debug_binary           '
+@@ -204,8 +204,8 @@ def RunScriptModule(module):
+     args = [sys.executable] + args
+ 
+   if show_command_and_exit:
+-    print 'program: "%s"' % program
+-    print 'args:', args
++    print('program: "%s"' % program)
++    print('args:', args)
+     sys.exit(0)
+ 
+   try:
+diff --git a/google/apputils/stopwatch.py b/google/apputils/stopwatch.py
+index 6b6f01a..3afcbc8 100644
+--- a/google/apputils/stopwatch.py
++++ b/google/apputils/stopwatch.py
+@@ -46,7 +46,10 @@ small_but_expensive function will show up in the timer for just_that and not
+ all_this.
+ """
+ 
+-import StringIO
++try:
++    from StringIO import StringIO ## for Python 2
++except ImportError:
++    from io import StringIO ## for Python 3
+ import time
+ 
+ 
+@@ -193,7 +196,7 @@ class StopWatch(object):
+     Returns:
+       A string describing the stopwatch.
+     """
+-    output = StringIO.StringIO()
++    output = StringIO()
+     results = self.results(verbose=verbose)
+     maxlength = max([len(result[0]) for result in results])
+     for result in results:

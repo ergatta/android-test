@@ -19,7 +19,7 @@ import subprocess
 import tempfile
 
 from tools.android.emulator import resources
-from google.apputils import basetest as googletest
+from google_apputils.google.apputils import basetest as googletest
 from tools.android.emulator import xserver
 
 

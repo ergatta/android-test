@@ -25,7 +25,7 @@ import tempfile
 from absl import flags
 import mox
 
-from google.apputils import basetest as googletest
+from google_apputils.google.apputils import basetest as googletest
 from tools.android.emulator import emulated_device
 from tools.android.emulator import emulator_meta_data_pb2
 from tools.android.emulator import reporting
