@@ -3,7 +3,7 @@
 # Description:
 #  Test App used for testing API integration tests in multi-window mode.
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_binary", "android_library")
+load("@rules_android//android:rules.bzl", "android_binary", "android_library")
 load("//build_extensions:jetify.bzl", "jetify_android_library")
 
 licenses(["notice"])

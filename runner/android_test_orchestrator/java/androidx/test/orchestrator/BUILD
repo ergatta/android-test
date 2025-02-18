@@ -1,7 +1,7 @@
 # Description:
 #   On Device Orchestrator, to run instrumentation tests sequentially from a single adb command
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 licenses(["notice"])
 

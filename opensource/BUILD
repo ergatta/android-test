@@ -1,4 +1,4 @@
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 # aliases that creates bazel targets that are equivalent to blaze
 

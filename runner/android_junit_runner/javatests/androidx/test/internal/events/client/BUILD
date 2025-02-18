@@ -1,4 +1,4 @@
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 load(
     "//build_extensions:axt_android_local_test.bzl",
     "axt_android_local_test",

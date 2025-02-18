@@ -1,6 +1,6 @@
 # Description: Tests for Runner
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_binary")
+load("@rules_android//android:rules.bzl", "android_binary")
 load("//build_extensions:android_library_test.bzl", "axt_android_library_test")
 load("//build_extensions:axt_android_application_test.bzl", "axt_android_application_test")
 load("//build_extensions:axt_android_local_test.bzl", "axt_android_local_test")

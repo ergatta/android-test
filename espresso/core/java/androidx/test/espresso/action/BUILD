@@ -1,7 +1,7 @@
 # Description:
 #  View Actions for espresso.
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 load("//build_extensions:kt_android_library.bzl", "kt_android_library")
 
 licenses(["notice"])

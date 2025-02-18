@@ -1,6 +1,6 @@
 # A shell command execution server to allow shell commands to be run at elevated permissions
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 package(default_applicable_licenses = ["//services:license"])
 

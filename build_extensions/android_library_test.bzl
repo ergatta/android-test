@@ -1,6 +1,6 @@
 """Wrapper around for android_library_test that adds additionsl features."""
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 def axt_android_library_test(
         name,

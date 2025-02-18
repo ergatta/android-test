@@ -3,7 +3,7 @@
 # Description:
 #  Test App used for foldable testing API integration tests.
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_binary", "android_library")
+load("@rules_android//android:rules.bzl", "android_binary", "android_library")
 load("//build_extensions:jetify.bzl", "jetify_android_library")
 
 licenses(["notice"])

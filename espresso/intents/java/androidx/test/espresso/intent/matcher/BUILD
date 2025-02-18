@@ -1,7 +1,7 @@
 # Description:
 #  Matchers for Intents and Intent-related objects
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 licenses(["notice"])
 

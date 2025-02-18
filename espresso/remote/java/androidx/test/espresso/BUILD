@@ -1,7 +1,7 @@
 # Description:
 #   Espresso - the new UI Test API for Android.
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 licenses(["notice"])
 

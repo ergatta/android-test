@@ -1,7 +1,7 @@
 # Description:
 #  Internal package for jarjar-ed shaded classes
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 licenses(["notice"])
 

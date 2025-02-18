@@ -1,7 +1,7 @@
 # Description:
 #   Test App used for Multi-process UI Testing Lib integration tests
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_binary")
+load("@rules_android//android:rules.bzl", "android_binary")
 load("//build_extensions:jetify.bzl", "jetify_android_library")
 
 licenses(["notice"])

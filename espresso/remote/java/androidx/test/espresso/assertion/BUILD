@@ -1,7 +1,7 @@
 # Description:
 #  View Assertions for New UI Test API.
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 licenses(["notice"])
 

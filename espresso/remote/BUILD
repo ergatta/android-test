@@ -1,6 +1,6 @@
 # Alias for androidx.test.espresso.remote API library
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_library")
+load("@rules_android//android:rules.bzl", "android_library")
 
 package(default_applicable_licenses = ["//espresso:license"])
 

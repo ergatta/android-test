@@ -1,6 +1,6 @@
 """Common functions for androidx_test tests."""
 
-load("@build_bazel_rules_android//android:rules.bzl", "android_test")
+load("@rules_android//android:rules.bzl", "android_test")
 
 API_LEVELS = [
     "15_x86",
