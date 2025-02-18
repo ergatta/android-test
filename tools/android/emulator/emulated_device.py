@@ -20,6 +20,7 @@
 import collections
 import contextlib
 import json
+import locale
 import logging
 import os
 import re
@@ -44,7 +45,7 @@ except ImportError as e:
   # Initialize X509 to None, so that we don't get NameErrors while trying to
   # boot up a device if users have not installed the X509 library.
   X509 = collections.namedtuple('X509', ['FORMAT_PEM', 'FORMAT_DER'])
-  print ('If you want to add certificates to the emulator, Please install '
+  print('If you want to add certificates to the emulator, Please install '
          'MCrypt library using sudo apt-get install python-mcrypt .')
 
 from absl import flags
@@ -59,6 +60,8 @@ from tools.android.emulator import emulator_meta_data_pb2
 from tools.android.emulator import reporting
 
 from tools.android.emulator import xserver
+
+ENCODING = locale.getpreferredencoding()
 
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('data_partition_size', None, '[START ONLY] expand data '
@@ -825,7 +828,7 @@ class EmulatedDevice(object):
 
       # the default size is ~256 megs, which fills up fast on iterative
       # development.
-      if 'ext4' in subprocess.check_output(['file', self._UserdataQemuFile()]):
+      if 'ext4' in subprocess.check_output(['file', self._UserdataQemuFile()]).decode(ENCODING):
         # getting this size right is pretty crucial - if it doesnt match
         # the underlying file the guest os will get confused.
         config_ini.write('disk.dataPartition.size=%s\n' %
@@ -836,7 +839,7 @@ class EmulatedDevice(object):
       # system partition must be less than 2GB (there's a constraint check in
       # qemu). Also we must set the commandline flag too - which sets both
       # userdata and system sizes, so everything is set to 2047 for sanity.
-      if 'ext4' in subprocess.check_output(['file', self._SystemFile()]):
+      if 'ext4' in subprocess.check_output(['file', self._SystemFile()]).decode(ENCODING):
         # getting this size right is pretty crucial - if it doesnt match
         # the underlying file the guest os will get confused.
         config_ini.write('disk.systemPartition.size=%s\n' %
@@ -855,7 +858,7 @@ class EmulatedDevice(object):
       config_ini.write('disk.cachePartition=1\n')
       config_ini.write('disk.cachePartition.path=cache.img\n')
       cache_size = '66m'
-      if 'ext4' in subprocess.check_output(['file', self._CacheFile()]):
+      if 'ext4' in subprocess.check_output(['file', self._CacheFile()]).decode(ENCODING):
         cache_size = os.path.getsize(self._CacheFile())
 
       # getting this size right is pretty crucial - if it doesnt match
@@ -1534,7 +1537,7 @@ class EmulatedDevice(object):
     if not self._display or self._display.open_gl_driver != HOST_OPEN_GL:
       lib_paths.append(gles_mesa)
     else:
-      out = subprocess.check_output(['ldd', self.android_platform.emulator_x86])
+      out = subprocess.check_output(['ldd', self.android_platform.emulator_x86]).decode(ENCODING)
       for line in out.splitlines():
         # line looks like:
         #   libGL.so.1 => /usr/lib/nvidia-367/libGL.so.1 (0x00007fbcd1c4b000)
@@ -1815,7 +1818,7 @@ class EmulatedDevice(object):
       with contextlib.closing(
           resources.GetResourceAsFile(
               'android_test_support/'
-              'tools/android/emulator/daemon/x86/pipe_traversal')) as piper:
+              'tools/android/emulator/daemon/x86/pipe_traversal', 'rb')) as piper:
         with open(os.path.join(services_dir, 'pipe_traversal'), 'w+b') as o:
           shutil.copyfileobj(piper, o)
           os.chmod(os.path.join(services_dir, 'pipe_traversal'), stat.S_IRWXU)
@@ -1919,7 +1922,7 @@ class EmulatedDevice(object):
     """The main loop of the watchdog process."""
     if new_process_group:
       os.setsid()
-    os.closerange(-1, subprocess.MAXFD)
+    os.closerange(-1, 1024)
     watchdog_dir = None
     if 'TEST_UNDECLARED_OUTPUTS_DIR' in os.environ:
       watchdog_dir = tempfile.mkdtemp(
@@ -1999,7 +2002,7 @@ class EmulatedDevice(object):
 
       if self.delete_temp_on_exit and self._emulator_tmp_dir:
         logging.info('Cleaning up data dirs.')
-        print 'cleanup data dirs...'
+        print('cleanup data dirs...')
         self.CleanUp()
         logging.info('Clean up done.')
 
@@ -2779,7 +2782,7 @@ class EmulatedDevice(object):
     port = int(self.emulator_adb_port)
     if FLAGS.skip_connect_device:
       lsof_out = subprocess.check_output('lsof -ni:%d || true' % port,
-                                         shell=True)
+                                         shell=True).decode(ENCODING)
       return bool(lsof_out)
     try:
       s = socket.create_connection(('localhost', port))
@@ -3276,7 +3279,7 @@ class EmulatedDevice(object):
     # Wait for 10 seconds before giving up.
     for _ in range(10):
       try:
-        output = subprocess.check_output(lsof_command)
+        output = subprocess.check_output(lsof_command).decode(ENCODING.decode(ENCODING))
         logging.info('lsof output :%s', output)
       except subprocess.CalledProcessError as err:
         # If no processes are writing to it, then we are done and it will throw
@@ -3459,7 +3462,7 @@ class EmulatedDevice(object):
     if not self._ShouldModifySystemImage(enable_guest_gl):
       return
 
-    if 'ext4' in subprocess.check_output(['file', self._SystemFile()]):
+    if 'ext4' in subprocess.check_output(['file', self._SystemFile()]).decode(ENCODING):
       debugfs_cmd = self._GetDebugfsCmd(enable_guest_gl)
       if debugfs_cmd:
         logging.info('Running debugfs commands: %s', debugfs_cmd)
@@ -3468,7 +3471,7 @@ class EmulatedDevice(object):
   def _ExecDebugfsCmd(self, image_file, cmd_list):
     """Execute debugfs commands from cmd_list on disk image file."""
     assert not self._emu_process_pid, 'Emulator is running!'
-    assert 'ext4' in subprocess.check_output(['file', image_file]), (
+    assert 'ext4' in subprocess.check_output(['file', image_file]).decode(ENCODING), (
         'Not ext4 image')
     assert os.path.exists('/sbin/debugfs'), 'No debugfs tool find'
     os.chmod(image_file, stat.S_IRWXU)

@@ -17,11 +17,12 @@
 
 
 import collections
-import ConfigParser
+import configparser
+import io
 import json
+import locale
 import logging
 import os
-import StringIO
 import subprocess
 import sys
 import tempfile
@@ -40,6 +41,8 @@ from tools.android.emulator import emulated_device
 from tools.android.emulator import emulator_meta_data_pb2
 from tools.android.emulator import reporting
 
+
+ENCODING = locale.getpreferredencoding()
 
 FLAGS = flags.FLAGS
 flags.DEFINE_enum('action', None,
@@ -465,25 +468,25 @@ def _RestartDevice(device,
 
   if 'x86' == proto.emulator_architecture:
     if not _IsKvmPresent():
-      print ''
-      print '=' * 80
+      print('')
+      print('=' * 80)
       print ('= By activating KVM on your local host you can increase the '
              'speed of the emulator.      =')
-      print '=' * 80
+      print('=' * 80)
     elif not proto.with_kvm:
-      print ''
-      print '=' * 80
+      print('')
+      print('=' * 80)
       print ('= Please add --no to your bazel command line, to create '
              'snapshot images   =')
       print ('= local with KVM support. This will increase the speed of the '
              'emulator.        =')
-      print '=' * 80
+      print('=' * 80)
   else:
-    print ''
-    print '=' * 80
+    print('')
+    print('=' * 80)
     print ('= By using x86 with KVM on your local host you can increase the '
            'speed of the emulator.')
-    print '=' * 80
+    print('=' * 80)
 
   proto.system_image_dir = system_images_dir
   sysimg = (
@@ -748,9 +751,9 @@ def _TryToConvertIniStyleFileToDict(ini_style_file):
   if ini_style_file:
     with open(ini_style_file) as real_text_handle:
       text = real_text_handle.read()
-      filehandle = StringIO.StringIO('[android]\n' + text)
+      filehandle = io.StringIO('[android]\n' + text)
       try:
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.readfp(filehandle)
         return dict(config.items('android'))
       finally:
@@ -827,7 +830,7 @@ def _HashFiles(files):
     return {}
 
   hashes_to_files = collections.OrderedDict()
-  for line in subprocess.check_output(['sha1sum'] + files).split('\n'):
+  for line in subprocess.check_output(['sha1sum'] + files).decode(ENCODING).split('\n'):
     if line:
       hash_and_file = line.split()
       hashes_to_files[hash_and_file[0]] = hash_and_file[1]
@@ -1060,9 +1063,9 @@ def _IsKvmPresent():
   kernel_module = os.access('/sys/class/misc/kvm/dev', os.R_OK)
   device_node = os.access(kvm_device, os.R_OK | os.W_OK)
   if not kernel_module:
-    print 'KVM Kernel module not readable.'
+    print('KVM Kernel module not readable.')
   if not device_node:
-    print '%s: not readable or writable by current user' % kvm_device
+    print('%s: not readable or writable by current user' % kvm_device)
 
   return device_node and kernel_module
 

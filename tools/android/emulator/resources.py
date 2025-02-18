@@ -27,8 +27,8 @@ def GetRunfilesDir():
   return FindRunfilesDir(os.path.abspath(starting_point))
 
 
-def GetResourceAsFile(file_path):
-  return open(GetResourceFilename(file_path))
+def GetResourceAsFile(file_path, *args):
+  return open(GetResourceFilename(file_path), *args)
 
 
 def GetResourceFilename(file_path):
